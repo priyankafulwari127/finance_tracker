@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_green/components/TextFields.dart';
 import 'package:go_green/controller/categoryController/CategoryController.dart';
-import 'package:go_green/controller/expenseController/ExpenseController.dart';
 import 'package:go_green/controller/incomeController/IncomeController.dart';
 import 'package:go_green/model/IconList.dart';
-import 'package:go_green/model/expense/Expense.dart';
+import 'package:go_green/model/transaction/Transaction.dart';
 import 'package:go_green/ui/ExpenseScreen.dart';
 
 import '../functions/Functions.dart';
@@ -16,7 +15,6 @@ class HomeScreen extends StatelessWidget {
 
   CategoryController categoryController = Get.put(CategoryController());
   IncomeController incomeController = Get.put(IncomeController());
-  ExpenseController expenseController = Get.put(ExpenseController());
   var myFunctions = Functions();
   TextEditingController nameController = TextEditingController();
   TextEditingController budgetController = TextEditingController();
@@ -91,15 +89,11 @@ class HomeScreen extends StatelessWidget {
                     final category = categoryController.categoryList[index];
                     return GestureDetector(
                       onTap: () {
-                        Get.to(ExpenseScreen(
-                            category: Category(
-                              categoryName: category.categoryName,
-                              iconPoints: category.iconPoints,
-                              fontFamily: category.fontFamily,
-                              iconFontPackage: category.iconFontPackage,
-                              categoryBudget: category.categoryBudget,
-                            ),
-                            expense: Expense(catId: category.key)));
+                        Get.to(
+                          () => ExpenseScreen(
+                            category: category,
+                          ),
+                        );
                       },
                       child: Card(
                         child: ListTile(

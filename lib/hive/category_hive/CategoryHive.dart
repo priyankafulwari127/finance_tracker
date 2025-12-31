@@ -1,4 +1,4 @@
-import 'package:go_green/model/expense/Expense.dart';
+import 'package:go_green/model/transaction/Transaction.dart';
 import 'package:hive/hive.dart';
 import 'package:go_green/model/category/Category.dart';
 
@@ -23,9 +23,12 @@ class CategoryHive {
       categoryBudget: categoryBudget,
       iconFontPackage: iconFontPackage,
     );
-    var key = categoryBox.add(newCat);
-    var expenseBoxName = 'expense_category_$key';
-    await Hive.openBox<Expense>(expenseBoxName);
+    var key = await categoryBox.add(newCat);
+    newCat.categoryId = key;
+    await newCat.save();
+
+    var transactionBox = 'transaction_category_$key';
+    await Hive.openBox<Transaction>(transactionBox);
   }
 
   Future<void> updateCategory(Category cat, int index) async {

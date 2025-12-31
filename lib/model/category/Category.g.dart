@@ -22,13 +22,15 @@ class CategoryAdapter extends TypeAdapter<Category> {
       fontFamily: fields[2] as String?,
       iconFontPackage: fields[3] as String?,
       categoryBudget: fields[4] as double?,
+      categoryId: fields[5] as int?,
+      totalAmount: fields[6] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, Category obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.categoryName)
       ..writeByte(1)
@@ -38,12 +40,20 @@ class CategoryAdapter extends TypeAdapter<Category> {
       ..writeByte(3)
       ..write(obj.iconFontPackage)
       ..writeByte(4)
-      ..write(obj.categoryBudget);
+      ..write(obj.categoryBudget)
+      ..writeByte(5)
+      ..write(obj.categoryId)
+      ..writeByte(6)
+      ..write(obj.totalAmount);
   }
 
   @override
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is CategoryAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CategoryAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }

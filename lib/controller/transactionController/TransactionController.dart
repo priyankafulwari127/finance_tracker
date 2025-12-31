@@ -1,22 +1,30 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_green/hive/transaction_hive/TransactionHive.dart';
+import 'package:go_green/model/category/Category.dart';
 import 'package:go_green/model/transaction/Transaction.dart';
+import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 
 class TransactionController extends GetxController {
   var transactionList = <Transaction>[].obs;
   var monthlyTransactionList = <Transaction>[].obs;
   TransactionHive transactionHive = TransactionHive();
   var selectedMonth = DateTime.now().obs;
+  var selectedDate;
+  TextEditingController dateController = TextEditingController();
 
   @override
   void onInit() {
-    getAllTransactions();
+    // getAllTransactions();
     filterTransactionListMonthly(selectedMonth.value);
     super.onInit();
   }
 
-  Future<void> getAllTransactions() async {
-    transactionList.value = transactionHive.getAllTransactions();
+  Future<void> getAllTransactions(int catId) async {
+    var transactionBox = await transactionHive.getAllTransactions(catId);
+    transactionList.assignAll(transactionBox);
   }
 
   double getTotalWithCategoryId(int catId) {
@@ -31,15 +39,12 @@ class TransactionController extends GetxController {
     return total;
   }
 
-  void addTransaction(double amount, String description, DateTime date, int categoryId) {
-    var newTransact = Transaction(
-      currentSpentAmount: amount,
-      description: description,
-      date: date,
-      categoryId: categoryId,
-    );
-    transactionList.add(newTransact);
+  Future<void> addTransaction(double amount, String description, DateTime date, int categoryId)async {
     transactionHive.addTransaction(amount, description, date, categoryId);
+    var categoryBox = Hive.box<Category>('category');
+    final category = categoryBox.values.firstWhere((c) => c.categoryId == categoryId);
+    category.totalAmount += amount;
+    await category.save();
   }
 
   // Future<void> updsate(int index, Category cat) async {
@@ -47,9 +52,9 @@ class TransactionController extends GetxController {
   //   await categoryHive.updateCategory(cat, index);
   // }
 
-  void deleteTransaction(int index) {
+  void deleteTransaction(int index, int catId) {
     transactionList.removeAt(index);
-    transactionHive.deleteTransaction(index);
+    transactionHive.deleteTransaction(index, catId);
   }
 
   List<Transaction> filterTransactionListMonthly(DateTime month, {int catId = 0}) {
@@ -72,5 +77,26 @@ class TransactionController extends GetxController {
   void changeMonth(DateTime newMonth) {
     selectedMonth.value = newMonth;
     filterTransactionListMonthly(newMonth);
+  }
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? picker = await showDatePicker(
+      initialDate: selectedDate ?? DateTime.now(),
+      context: context,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if(picker != null && picker != selectedDate){
+      var formattedDate = DateFormat('dd-MM-yyyy').format(picker);
+      dateController.text = formattedDate;
+      selectedDate = picker;
+      // transaction.date = picker;
+    }
+  }
+
+  @override
+  void onClose() {
+    dateController.dispose();
+    super.onClose();
   }
 }

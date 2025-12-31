@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_green/controller/expenseController/ExpenseController.dart';
 import 'package:go_green/controller/transactionController/TransactionController.dart';
-import 'package:go_green/model/expense/Expense.dart';
 import 'package:go_green/model/transaction/Transaction.dart';
 import 'package:go_green/ui/TransactionsScreen.dart';
 import 'package:intl/intl.dart';
@@ -14,11 +12,12 @@ const Color kBackground = Color(0xFFF6F7FB);
 
 class ExpenseScreen extends StatelessWidget {
   final Category category;
-  final Expense expense;
 
-  ExpenseScreen({super.key, required this.category, required this.expense});
+  ExpenseScreen({
+    super.key,
+    required this.category,
+  });
 
-  ExpenseController expenseController = Get.put(ExpenseController());
   TransactionController transactionController = Get.put(TransactionController());
 
   final TextEditingController amountController = TextEditingController();
@@ -27,6 +26,13 @@ class ExpenseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final int? catId = category.categoryId;
+
+    // Load transactions for this category when screen opens
+    if (catId != null) {
+      transactionController.getAllTransactions(catId);
+    }
+
     return Scaffold(
       backgroundColor: kBackground,
       appBar: AppBar(
@@ -48,38 +54,43 @@ class ExpenseScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 24),
-            _summaryCard(expense),
+            _summaryCard(),
             const SizedBox(height: 24),
-            _inputSection(expense),
+            _inputSection(),
             const SizedBox(height: 90),
           ],
         ),
       ),
-      bottomNavigationBar: _bottomButtons(expense),
+      bottomNavigationBar: _bottomButtons(),
     );
   }
 
-  Widget _summaryCard(Expense expense) {
+  Widget _summaryCard() {
+    final int? catId = category.categoryId;
+
+    if (catId == null) {
+      return const Column(
+        children: [
+          Text("Total Spent"),
+          SizedBox(height: 6),
+          Text("₹ 0", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+        ],
+      );
+    }
+
     return Column(
       children: [
-        const Text(
-          "Total Spent",
-          style: TextStyle(color: Colors.black),
-        ),
-        const SizedBox(height: 6),
+        const Text("Total Spent This Month"),
+        const SizedBox(height: 8),
         Text(
-          "₹ ${expense.totalAmount ?? 0.0}",
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-          ),
+          "₹ ${category.totalAmount.toStringAsFixed(2)}",
+          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
         ),
       ],
     );
   }
 
-  Widget _inputSection(Expense expense) {
+  Widget _inputSection() {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -125,12 +136,12 @@ class ExpenseScreen extends StatelessWidget {
           const SizedBox(height: 18),
           _label("Date"),
           _textField(
-            controller: expenseController.dateController,
+            controller: transactionController.dateController,
             hint: "DD-MM-YYYY",
             icon: Icons.calendar_month_rounded,
             readOnly: true,
             onTap: () {
-              expenseController.selectDate(Get.context!, expense);
+              transactionController.selectDate(Get.context!);
             },
           ),
           const SizedBox(height: 18),
@@ -149,7 +160,7 @@ class ExpenseScreen extends StatelessWidget {
     );
   }
 
-  Widget _bottomButtons(Expense expense) {
+  Widget _bottomButtons() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
@@ -172,13 +183,13 @@ class ExpenseScreen extends StatelessWidget {
               ),
               onPressed: () {
                 double spentAmount = double.tryParse(amountController.text) ?? 0.0;
-                Get.to( () =>
-                  TransactionsScreen(
-                      spentAmount: spentAmount,
-                      description: descriptionController.text,
-                      date: expenseController.dateController.text,
-                      categoryId: category.key,
-                      ),
+                Get.to(
+                  () => TransactionsScreen(
+                    spentAmount: spentAmount,
+                    description: descriptionController.text,
+                    date: transactionController.dateController.text,
+                    categoryId: category.categoryId!,
+                  ),
                 );
               },
               child: const Text(
@@ -201,30 +212,34 @@ class ExpenseScreen extends StatelessWidget {
               onPressed: () async {
                 double enteredAmount = double.tryParse(amountController.text) ?? 0.0;
                 var budget = category.categoryBudget ?? 0.0;
+                final int catId = category.categoryId ?? 0;
+                if (category.categoryId == null) {
+                  Get.snackbar("Error", "Category ID missing!");
+                  return;
+                }
 
                 if (enteredAmount == 0) {
                   Get.snackbar("Error", "Please enter amount");
-                } else if (expenseController.dateController.text.isEmpty) {
+                } else if (transactionController.dateController.text.isEmpty) {
                   Get.snackbar("Error", "Please select date");
                 } else if (budget == 0) {
                   Get.snackbar("Error", "Please enter budget");
                 } else if (enteredAmount >= budget) {
                   Get.snackbar("Error", "Spent amount is greater than budget");
                 } else {
-                  var date = DateFormat('dd-MM-yyyy')
-                      .parse(expenseController.dateController.text);
+                  var date = DateFormat('dd-MM-yyyy').parse(transactionController.dateController.text);
                   transactionController.addTransaction(
                     enteredAmount,
                     descriptionController.text,
                     date,
-                    category.key,
+                    catId,
                   );
-                  expenseController.getTotalWithCategoryId(expense);
+                  // expenseController.getTotalWithCategoryId(expense);
 
                   Get.snackbar("Success", "Your spent is saved");
                   amountController.clear();
                   descriptionController.clear();
-                  expenseController.dateController.clear();
+                  transactionController.dateController.clear();
                 }
               },
               child: const Text(

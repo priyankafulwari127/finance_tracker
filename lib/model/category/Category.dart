@@ -14,6 +14,10 @@ class Category extends HiveObject {
   String? iconFontPackage;
   @HiveField(4)
   double? categoryBudget;
+  @HiveField(5)
+  int? categoryId;
+  @HiveField(6)
+  double totalAmount = 0.0;
 
   Category({
     required this.categoryName,
@@ -21,6 +25,8 @@ class Category extends HiveObject {
     required this.fontFamily,
     this.iconFontPackage,
     required this.categoryBudget,
+    this.categoryId,
+    this.totalAmount = 0.0,
   });
 
   IconData getIconData() {
