@@ -27,8 +27,6 @@ class ExpenseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int? catId = category.categoryId;
-
-    // Load transactions for this category when screen opens
     if (catId != null) {
       transactionController.getAllTransactions(catId);
     }
@@ -182,12 +180,8 @@ class ExpenseScreen extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                double spentAmount = double.tryParse(amountController.text) ?? 0.0;
                 Get.to(
                   () => TransactionsScreen(
-                    spentAmount: spentAmount,
-                    description: descriptionController.text,
-                    date: transactionController.dateController.text,
                     categoryId: category.categoryId!,
                   ),
                 );

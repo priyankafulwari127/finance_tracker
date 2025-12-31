@@ -60,18 +60,14 @@ class TransactionController extends GetxController {
   List<Transaction> filterTransactionListMonthly(DateTime month, {int catId = 0}) {
     monthlyTransactionList.clear();
     for (var transaction in transactionList) {
-      if (transaction.date.year == month.year && transaction.date.month == month.month) {
+      if (transaction.date.year == month.year && transaction.date.month == month.month && transaction.categoryId == catId || catId == 0) {
         monthlyTransactionList.add(transaction);
-        print("category Id: $catId");
-        print("current month: ${transaction.date.month}, ${transaction.date.year}");
       }
     }
     //sorting the transaction list
     monthlyTransactionList.sort((a, b) => b.date.compareTo(a.date));
-    if (catId.isNull) {
-      return monthlyTransactionList.where((t) => t.categoryId == catId).toList();
-    }
-    return [];
+
+    return monthlyTransactionList;
   }
 
   void changeMonth(DateTime newMonth) {

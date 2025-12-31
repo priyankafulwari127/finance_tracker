@@ -1,22 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:go_green/controller/categoryController/CategoryController.dart';
 import 'package:go_green/controller/transactionController/TransactionController.dart';
 import 'package:intl/intl.dart';
 
 class TransactionsScreen extends StatelessWidget {
-  final double spentAmount;
-  final String description;
-  final String date;
   final int categoryId;
 
   const TransactionsScreen({
     super.key,
-    required this.spentAmount,
-    required this.description,
-    required this.date,
     required this.categoryId,
   });
 
@@ -24,6 +17,7 @@ class TransactionsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     TransactionController transactionController = Get.put(TransactionController());
     CategoryController categoryController = Get.put(CategoryController());
+    transactionController.getAllTransactions(categoryId);
 
     return Scaffold(
       appBar: AppBar(
@@ -97,67 +91,75 @@ class TransactionsScreen extends StatelessWidget {
               height: 15,
             ),
             Expanded(
-              child: Obx(
-                () {
-                  var transactions = transactionController.filterTransactionListMonthly(
-                    transactionController.selectedMonth.value,
-                    catId: categoryId,
-                  );
-                  return transactions.isEmpty
-                      ? const Text("No Transaction found")
-                      : ListView.builder(
-                          itemCount: transactions.length,
-                          itemBuilder: (context, index) {
-                            return Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+              child: FutureBuilder(
+                future: transactionController.getAllTransactions(categoryId),
+                builder: (context, asyncSnapshot) {
+                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return Obx(
+                    () {
+                      var transactions = transactionController.filterTransactionListMonthly(
+                        transactionController.selectedMonth.value,
+                        catId: categoryId,
+                      );
+                      return transactions.isEmpty
+                          ? const Text("No Transaction found")
+                          : ListView.builder(
+                              itemCount: transactions.length,
+                              itemBuilder: (context, index) {
+                                return Card(
+                                  elevation: 5,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              transactions.elementAt(index).description,
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 2,
+                                            ),
+                                            Text(
+                                              transactions.elementAt(index).date.toString(),
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Spacer(
+                                          flex: 1,
+                                        ),
                                         Text(
-                                          transactions.elementAt(index).description,
+                                          transactions.elementAt(index).currentSpentAmount.toString(),
                                           style: const TextStyle(
                                             color: Colors.black,
-                                            fontSize: 16,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
                                           ),
-                                        ),
-                                        const SizedBox(
-                                          height: 2,
-                                        ),
-                                        Text(
-                                          transactions.elementAt(index).date.toString(),
-                                          style: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
-                                        ),
+                                        )
                                       ],
                                     ),
-                                    const Spacer(
-                                      flex: 1,
-                                    ),
-                                    Text(
-                                      transactions.elementAt(index).currentSpentAmount.toString(),
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                );
+                              },
                             );
-                          },
-                        );
-                },
+                    },
+                  );
+                }
               ),
             ),
           ],
