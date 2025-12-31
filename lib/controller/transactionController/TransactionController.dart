@@ -12,13 +12,16 @@ class TransactionController extends GetxController {
   var monthlyTransactionList = <Transaction>[].obs;
   TransactionHive transactionHive = TransactionHive();
   var selectedMonth = DateTime.now().obs;
-  var selectedDate;
+  DateTime selectedDate = DateTime.now();
+  RxDouble monthlyExpense = 0.0.obs;
   TextEditingController dateController = TextEditingController();
+
+  late Box<double> summaryBox;
 
   @override
   void onInit() {
-    // getAllTransactions();
     filterTransactionListMonthly(selectedMonth.value);
+    getMonthlyExpense();
     super.onInit();
   }
 
@@ -39,22 +42,53 @@ class TransactionController extends GetxController {
     return total;
   }
 
-  Future<void> addTransaction(double amount, String description, DateTime date, int categoryId)async {
+  Future<void> loadOrCalculateMonthlyExpense() async {
+    final now = DateTime.now();
+    final key = 'monthly_${now.year}_${now.month}';
+    final savedTotal = summaryBox.get(key);
+    if (savedTotal != null) {
+      monthlyExpense.value = savedTotal;
+    } else {
+      await getMonthlyExpense();
+    }
+  }
+
+  Future<void> getMonthlyExpense() async {
+    var expense = 0.0;
+    var currentMonth = DateTime.now().month;
+    var currentYear = DateTime.now().year;
+
+    final key = 'monthly_${currentYear}_$currentMonth';
+    final categoryBox = Hive.box<Category>('category');
+    final categories = categoryBox.values.toList();
+
+    for (var category in categories) {
+      if (category.categoryId == null) continue;
+
+      final transactions = await transactionHive.getAllTransactions(category.categoryId!);
+      for (var t in transactions) {
+        if (t.date.month == currentMonth && t.date.year == currentYear) {
+          expense += t.currentSpentAmount;
+        }
+      }
+    }
+    monthlyExpense.value = expense;
+    await summaryBox.put(key, expense);
+  }
+
+  Future<void> addTransaction(double amount, String description, DateTime date, int categoryId) async {
     transactionHive.addTransaction(amount, description, date, categoryId);
     var categoryBox = Hive.box<Category>('category');
     final category = categoryBox.values.firstWhere((c) => c.categoryId == categoryId);
     category.totalAmount += amount;
     await category.save();
+    getMonthlyExpense();
   }
-
-  // Future<void> updsate(int index, Category cat) async {
-  //   categoryList[index] = cat;
-  //   await categoryHive.updateCategory(cat, index);
-  // }
 
   void deleteTransaction(int index, int catId) {
     transactionList.removeAt(index);
     transactionHive.deleteTransaction(index, catId);
+    getMonthlyExpense();
   }
 
   List<Transaction> filterTransactionListMonthly(DateTime month, {int catId = 0}) {
@@ -64,9 +98,7 @@ class TransactionController extends GetxController {
         monthlyTransactionList.add(transaction);
       }
     }
-    //sorting the transaction list
     monthlyTransactionList.sort((a, b) => b.date.compareTo(a.date));
-
     return monthlyTransactionList;
   }
 
@@ -77,12 +109,12 @@ class TransactionController extends GetxController {
 
   Future<void> selectDate(BuildContext context) async {
     final DateTime? picker = await showDatePicker(
-      initialDate: selectedDate ?? DateTime.now(),
+      initialDate: selectedDate,
       context: context,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
-    if(picker != null && picker != selectedDate){
+    if (picker != null && picker != selectedDate) {
       var formattedDate = DateFormat('dd-MM-yyyy').format(picker);
       dateController.text = formattedDate;
       selectedDate = picker;

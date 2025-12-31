@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:go_green/components/TextFields.dart';
 import 'package:go_green/controller/categoryController/CategoryController.dart';
 import 'package:go_green/controller/incomeController/IncomeController.dart';
+import 'package:go_green/controller/transactionController/TransactionController.dart';
 import 'package:go_green/model/IconList.dart';
 import 'package:go_green/model/transaction/Transaction.dart';
 import 'package:go_green/ui/ExpenseScreen.dart';
@@ -15,6 +16,7 @@ class HomeScreen extends StatelessWidget {
 
   CategoryController categoryController = Get.put(CategoryController());
   IncomeController incomeController = Get.put(IncomeController());
+  TransactionController transactionController = Get.put(TransactionController());
   var myFunctions = Functions();
   TextEditingController nameController = TextEditingController();
   TextEditingController budgetController = TextEditingController();
@@ -50,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _summaryTile("Monthly Income", incomeController.income.value),
-                    _summaryTile("Monthly Expense", 0.0),
+                    _summaryTile("Monthly Expense", transactionController.monthlyExpense.value),
                   ],
                 ),
               );

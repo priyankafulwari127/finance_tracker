@@ -13,6 +13,7 @@ void main() async{
   Hive.registerAdapter(TransactionAdapter());
 
   await Hive.openBox<Category>('category');
+  await Hive.openBox<double>('monthly_summary');
 
   runApp(const MyApp());
 }
