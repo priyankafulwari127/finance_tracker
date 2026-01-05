@@ -16,7 +16,6 @@ class TransactionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TransactionController transactionController = Get.put(TransactionController());
-    CategoryController categoryController = Get.put(CategoryController());
     transactionController.getAllTransactions(categoryId);
 
     return Scaffold(
@@ -132,7 +131,7 @@ class TransactionsScreen extends StatelessWidget {
                                               height: 2,
                                             ),
                                             Text(
-                                              transactions.elementAt(index).date.toString(),
+                                              DateFormat('dd-MM-yyyy').format(transactions.elementAt(index).date),
                                               style: const TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 14,

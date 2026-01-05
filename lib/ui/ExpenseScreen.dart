@@ -52,7 +52,11 @@ class ExpenseScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 24),
-            _summaryCard(),
+            Obx(()
+              {
+                return _summaryCard();
+              }
+            ),
             const SizedBox(height: 24),
             _inputSection(),
             const SizedBox(height: 90),
@@ -76,15 +80,26 @@ class ExpenseScreen extends StatelessWidget {
       );
     }
 
-    return Column(
-      children: [
-        const Text("Total Spent This Month"),
-        const SizedBox(height: 8),
-        Text(
-          "₹ ${category.totalAmount.toStringAsFixed(2)}",
-          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-        ),
-      ],
+    return FutureBuilder<double>(
+      future: transactionController.getTotalWithCategoryId(catId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+
+        final total = snapshot.data ?? 0.0;
+
+        return Column(
+          children: [
+            const Text("Total Spent This Month", style: TextStyle(fontSize: 16)),
+            const SizedBox(height: 8),
+            Text(
+              "₹ ${total.toStringAsFixed(2)}",
+              style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+            ),
+          ],
+        );
+      },
     );
   }
 

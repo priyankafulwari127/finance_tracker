@@ -30,7 +30,7 @@ class TransactionController extends GetxController {
     transactionList.assignAll(transactionBox);
   }
 
-  double getTotalWithCategoryId(int catId) {
+  Future<double> getTotalWithCategoryId(int catId) async{
     var total = 0.0;
     var currentMonth = DateTime.now().month;
     var currentYear = DateTime.now().year;

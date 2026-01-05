@@ -107,6 +107,7 @@ class HomeScreen extends StatelessWidget {
                                 myFunctions.editCategory(context, index, category);
                               } else if (value == 'delete') {
                                 categoryController.deleteCategory(index);
+                                transactionController.getMonthlyExpense();
                               }
                             },
                             itemBuilder: (context) => [
