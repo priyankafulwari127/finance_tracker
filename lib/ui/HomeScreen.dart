@@ -5,11 +5,9 @@ import 'package:go_green/controller/categoryController/CategoryController.dart';
 import 'package:go_green/controller/incomeController/IncomeController.dart';
 import 'package:go_green/controller/transactionController/TransactionController.dart';
 import 'package:go_green/model/IconList.dart';
-import 'package:go_green/model/transaction/Transaction.dart';
 import 'package:go_green/ui/ExpenseScreen.dart';
 
 import '../functions/Functions.dart';
-import '../model/category/Category.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -27,14 +25,12 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Finly"),
+        title: const Text(
+          "Fintro",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.indigo,
         centerTitle: true,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add default action
-        },
-        child: const Icon(Icons.add),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -45,7 +41,7 @@ class HomeScreen extends StatelessWidget {
               return Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: Colors.indigo.shade50,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -65,15 +61,31 @@ class HomeScreen extends StatelessWidget {
                   onPressed: () {
                     myFunctions.addIncome(context, inController, 'Enter your income');
                   },
-                  icon: const Icon(Icons.add),
-                  label: const Text("Add Income"),
+                  icon: const Icon(
+                    Icons.add,
+                    color: Colors.indigo,
+                  ),
+                  label: const Text(
+                    "Add Income",
+                    style: TextStyle(
+                      color: Colors.indigo,
+                    ),
+                  ),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
                     myFunctions.addCategory(context, nameController, budgetController, iconList);
                   },
-                  icon: const Icon(Icons.category),
-                  label: const Text("Add Category"),
+                  icon: const Icon(
+                    Icons.category,
+                    color: Colors.indigo,
+                  ),
+                  label: const Text(
+                    "Add Category",
+                    style: TextStyle(
+                      color: Colors.indigo,
+                    ),
+                  ),
                 ),
               ],
             ),

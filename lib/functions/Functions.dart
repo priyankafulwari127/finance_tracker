@@ -203,7 +203,7 @@ class Functions {
                                               ),
                                             ),
                                           ),
-                                          color: categoryController.selectedIndex.value == index ? Colors.deepPurple[400] : Colors.grey[350],
+                                          color: categoryController.selectedIndex.value == index ? Colors.indigo[400] : Colors.grey[350],
                                           child: Icon(
                                             icon,
                                             color: categoryController.selectedIndex.value == index ? Colors.white : Colors.black,
@@ -238,7 +238,7 @@ class Functions {
                           width: MediaQuery.of(context).size.height,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple,
+                              backgroundColor: Colors.indigo,
                               shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(
@@ -329,7 +329,7 @@ class Functions {
                         width: MediaQuery.of(context).size.height,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple,
+                            backgroundColor: Colors.indigo,
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(

@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../model/category/Category.dart';
 
-const Color kPrimary = Color(0xFF6C4CF1);
+const Color kPrimary = Colors.indigo;
 const Color kBackground = Color(0xFFF6F7FB);
 
 class ExpenseScreen extends StatelessWidget {
@@ -39,10 +39,16 @@ class ExpenseScreen extends StatelessWidget {
         centerTitle: true,
         title: Text(
           category.categoryName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+          ),
           onPressed: () => Get.back(),
         ),
       ),
@@ -52,11 +58,9 @@ class ExpenseScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 24),
-            Obx(()
-              {
-                return _summaryCard();
-              }
-            ),
+            Obx(() {
+              return _summaryCard();
+            }),
             const SizedBox(height: 24),
             _inputSection(),
             const SizedBox(height: 90),
@@ -294,7 +298,7 @@ class ExpenseScreen extends StatelessWidget {
         prefixIcon: Icon(icon),
         hintText: hint,
         filled: true,
-        fillColor: Colors.grey.shade100,
+        fillColor: Colors.indigo.withOpacity(0.06),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,

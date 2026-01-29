@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_green/controller/categoryController/CategoryController.dart';
 import 'package:go_green/controller/transactionController/TransactionController.dart';
 import 'package:intl/intl.dart';
 
@@ -38,7 +37,7 @@ class TransactionsScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.indigo,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
