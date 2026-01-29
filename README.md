@@ -1,4 +1,4 @@
-# go_green
+# finance_tracker
 
 A new Flutter project.
 
